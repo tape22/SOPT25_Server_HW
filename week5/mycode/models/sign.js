@@ -11,9 +11,9 @@ const table = 'Sign';
 
 module.exports={
     // 회원가입 
-    signup: async({userId,hashPwd,email,salt})=>{
+    signup: async({userId,key,email,salt})=>{
         const fields = 'userId,password,email,salt';
-        const questions =  `'${userId}','${hashPwd}','${email}','${salt}'`; //salt값 꼭 저장.
+        const questions =  `'${userId}','${key}','${email}','${salt}'`; //salt값 꼭 저장.
         const query = `INSERT INTO ${table} (${fields}) VALUES(${questions})`; 
         const result = await pool.queryParam_None(query);
         
@@ -56,19 +56,20 @@ module.exports={
         }
 
         //받은 password값이랑 DB에 있는 값이랑 비교
-        const salt = JSON.parse(result[0].salt); //DB에 있는 salt
-        const pwd = JSON.stringify(result[0].password).replace(/['"]+/g, ''); //값이 ""큰따옴표가 붙어서 나오기 때문에 제거해줘야함.
-        const hashPwd_login = crypto.createHash("sha512").update({password}+salt).digest("hex"); 
+        const salt = JSON.stringify(result[0].salt).replace(/['"]+/g, ''); //DB에 있는 salt
+        const pwd = JSON.stringify(result[0].password).replace(/['"]+/g, ''); //값이 ""큰따옴표가 붙어서 나오기 때문에 제거해줘야함
+
+        const derivedKey = crypto.pbkdf2Sync(password, salt, 1, 32, 'sha512');
+        const pwdkey =  derivedKey.toString('base64');
+        console.log(pwdkey)
         
-        if (pwd != hashPwd_login){
+        if (pwd != pwdkey){
             return{
                 code : stC.BAD_REQUEST,
                 json : utils.successFalse(resM.MISS_MATCH_PW)
             };
-        }
-
-
-        //토큰 발행(jwt)하고 성공 메시지 보내기
+        }else{
+            //토큰 발행(jwt)하고 성공 메시지 보내기
         const token = JSON.stringify(jwt.sign(result[0]).token);
         const insert = await pool.queryParam_None(`UPDATE ${table} SET token = '${token}' WHERE (userId = '${userId}')`);
         
@@ -82,7 +83,6 @@ module.exports={
             json: utils.successTrue(resM.SIGN_IN_SUCCESS)
         }
 
-
-
+        }
     }
  };

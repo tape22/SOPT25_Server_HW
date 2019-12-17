@@ -11,13 +11,7 @@ const crypto = require('crypto');
 
 router.post('/signup',async(req,res)=>{
     const {userId, password, email} = req.body;
-    //console.log(req.body);
 
-    //pwd salt값 뿌려주기
-    let salt = Math.round((new Date().valueOf()*Math.random())+"");
-    let hashPwd = crypto.createHash("sha512").update({password}+salt).digest("hex");
-
-    
     //공백 값 체크
     if(!userId || !password || !email){
         res.status(stC.BAD_REQUEST).send(utils.successFalse(resM.NULL_VALUE));
@@ -26,7 +20,14 @@ router.post('/signup',async(req,res)=>{
 
     //회원가입
     try{
-        const {code,json}= await Sign.signup({userId,hashPwd,email,salt});
+        //pwd salt값 뿌려주기
+        const salt = crypto.randomBytes(32).toString('base64');
+        console.log(salt);
+        const derivedKey = crypto.pbkdf2Sync(password, salt, 1, 32, 'sha512');
+        const key =  derivedKey.toString('base64');
+        console.log(key)
+        
+        const {code,json}= await Sign.signup({userId,key,email,salt});
         res.status(code).send(json);
 
     }catch(err){
