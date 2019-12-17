@@ -16,14 +16,13 @@ const options = {
 module.exports = { // sign? 유효한 회원임까지 인식을 했으면 이제 그 회원 데이터대로 토큰 만들기
     sign: (user) => {
         const payload = {
-            idx: user.idx,
-            grade: user.grade,
-            name: user.name
+            idx: user.userIdx,
+            id : user.userId
         };
         //발급받은 refreshToken은 반드시 디비에 저장해야 한다.
         const result = { // 페이로드, 지정한 시크릿 키, 옵션
             token: jwt.sign(payload, secretOrPrivateKey, options), //토큰이 딱 만들어짐! 사용자 판별할 수 있는 토큰이 딱!
-            refreshToken: randToken.uid(256)
+            //refreshToken: randToken.uid(256)
         };
         return result;
     },

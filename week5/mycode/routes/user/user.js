@@ -12,12 +12,11 @@ const crypto = require('crypto');
 router.post('/signup',async(req,res)=>{
     const {userId, password, email} = req.body;
     //console.log(req.body);
-    
+
     //pwd salt값 뿌려주기
-    let pwd = password;
     let salt = Math.round((new Date().valueOf()*Math.random())+"");
-    let hashPwd = crypto.createHash("sha512").update(pwd+salt).digest("hex");
-    //console.log(hashPwd);
+    let hashPwd = crypto.createHash("sha512").update({password}+salt).digest("hex");
+
     
     //공백 값 체크
     if(!userId || !password || !email){
