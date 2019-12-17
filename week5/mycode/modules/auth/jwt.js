@@ -7,7 +7,7 @@ const {
 
 const options = {
     algorithm: "HS256",
-    expiresIn: "1h",
+    expiresIn: "30h",
     issuer: "jungmin" // 토큰을 발행한 사람의 이름
 };
 
@@ -43,7 +43,7 @@ module.exports = { // sign? 유효한 회원임까지 인식을 했으면 이제
                 return -2;
             }
         }
-        return decoded;
+        return decoded,'valid';
 
     },
     refresh: (user) => {

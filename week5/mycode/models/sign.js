@@ -13,7 +13,7 @@ module.exports={
     // 회원가입 
     signup: async({userId,key,email,salt})=>{
         const fields = 'userId,password,email,salt';
-        const questions =  `'${userId}','${key}','${email}','${salt}'`; //salt값 꼭 저장.
+        const questions = `'${userId}','${key}','${email}','${salt}'`; //salt값 꼭 저장.
         const query = `INSERT INTO ${table} (${fields}) VALUES(${questions})`; 
         const result = await pool.queryParam_None(query);
         
@@ -27,7 +27,7 @@ module.exports={
             };
         }else{
             // 회원가입
-            if( result.length == 0){
+            if(result.length == 0){
                 return{
                     code : stC.INTERNAL_SERVER_ERROR,
                     json : utils.successFalse(resM.INTERNAL_SERVER_ERROR)
@@ -80,7 +80,7 @@ module.exports={
 
         return{
             code: stC.OK,
-            json: utils.successTrue(resM.SIGN_IN_SUCCESS)
+            json: utils.successTrue(resM.SIGN_IN_SUCCESS,token)
         }
 
         }
