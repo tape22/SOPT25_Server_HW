@@ -28,7 +28,7 @@ module.exports ={
         };
     },
 
-    read : async({blogIdx})=>{
+    readSelect : async({blogIdx})=>{
         const result = await pool.queryParam_None(`SELECT * FROM ${table} WHERE blogIdx = '${blogIdx}'`);
 
         if(result.length ==0){
